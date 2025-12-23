@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hangman</title>
+  <style>
+    :root {
+      --bg: #f4f0e6;
+      --ink: #2a2a2a;
+      --accent: #5b7c99;
+      --accent-dark: #3a5368;
+      --warn: #b24a3a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Georgia", "Times New Roman", serif;
+      color: var(--ink);
+      background: linear-gradient(135deg, #e6dfd2, #f4f0e6 55%, #d7d0c2);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      max-width: 980px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: center;
+    }
+
+    .panel {
+      background: #fffaf1;
+      border: 2px solid #e0d6c4;
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 20px 45px rgba(44, 33, 18, 0.12);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 2.3rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin: 0 0 20px;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #4a4237;
+    }
+
+    .board {
+      display: grid;
+      grid-template-rows: auto auto auto 1fr;
+      gap: 16px;
+    }
+
+    .word {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    .slot {
+      border-bottom: 3px solid var(--ink);
+      width: 36px;
+      text-align: center;
+      padding-bottom: 6px;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: #4a4237;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .status strong {
+      color: var(--accent-dark);
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(32px, 1fr));
+      gap: 8px;
+    }
+
+    .key {
+      border: 2px solid var(--accent);
+      background: #f0f5f8;
+      color: var(--accent-dark);
+      font-weight: 600;
+      padding: 10px 0;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .key:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .key.correct {
+      background: #d3eadf;
+      border-color: #4e9a66;
+      color: #2e6b45;
+    }
+
+    .key.wrong {
+      background: #f4d3ce;
+      border-color: var(--warn);
+      color: #8a2e23;
+    }
+
+    .key:not(:disabled):hover {
+      transform: translateY(-2px);
+      background: #d9e4ec;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .button {
+      border: none;
+      background: var(--accent-dark);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .button.secondary {
+      background: #e6dfd2;
+      color: #40372c;
+      border: 2px solid #c8bba7;
+    }
+
+    .figure {
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+    }
+
+    .gallows {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-align: center;
+      background: #e8e1d5;
+      color: #3b342a;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .message.win {
+      background: #dff1e6;
+      color: #2c6141;
+      animation: winPulse 0.7s ease-out;
+      box-shadow: 0 0 0 6px rgba(79, 153, 102, 0.2);
+    }
+
+    .message.lose {
+      background: #f4d3ce;
+      color: #7b2a20;
+      animation: loseShake 0.6s ease-in-out;
+      box-shadow: 0 0 0 6px rgba(178, 74, 58, 0.2);
+    }
+
+    @keyframes winPulse {
+      0% {
+        transform: scale(0.95);
+      }
+      60% {
+        transform: scale(1.03);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    @keyframes loseShake {
+      0% {
+        transform: translateX(0);
+      }
+      20% {
+        transform: translateX(-6px);
+      }
+      40% {
+        transform: translateX(6px);
+      }
+      60% {
+        transform: translateX(-4px);
+      }
+      80% {
+        transform: translateX(4px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 1.9rem;
+      }
+
+      .word {
+        font-size: 1.6rem;
+      }
+
+      .slot {
+        width: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="panel">
+      <h1>Hangman</h1>
+      <p class="subtitle">
+        Guess the secret word before I slime this guy. Use your keyboard or tap letters below.
+      </p>
+      <div class="board">
+        <div class="word" id="word"></div>
+        <div class="status">
+          <div>Misses: <strong id="misses">0</strong> / 6</div>
+          <div>Guessed: <strong id="guessed">—</strong></div>
+        </div>
+        <div class="message" id="message">Ready when you are.</div>
+        <div class="keyboard" id="keyboard"></div>
+      </div>
+      <div class="actions">
+        <button class="button" id="new-game">New Word</button>
+        <button class="button secondary" id="reveal">Reveal Word</button>
+      </div>
+    </section>
+    <section class="panel figure">
+      <svg class="gallows" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg">
+        <line x1="20" y1="240" x2="120" y2="240" stroke="#4a4237" stroke-width="6" />
+        <line x1="60" y1="240" x2="60" y2="30" stroke="#4a4237" stroke-width="6" />
+        <line x1="60" y1="30" x2="140" y2="30" stroke="#4a4237" stroke-width="6" />
+        <line x1="140" y1="30" x2="140" y2="60" stroke="#4a4237" stroke-width="6" />
+        <circle id="head" cx="140" cy="80" r="20" stroke="#7b2a20" stroke-width="4" fill="none" opacity="0" />
+        <line id="body" x1="140" y1="100" x2="140" y2="150" stroke="#7b2a20" stroke-width="4" opacity="0" />
+        <line id="arm-left" x1="140" y1="120" x2="115" y2="135" stroke="#7b2a20" stroke-width="4" opacity="0" />
+        <line id="arm-right" x1="140" y1="120" x2="165" y2="135" stroke="#7b2a20" stroke-width="4" opacity="0" />
+        <line id="leg-left" x1="140" y1="150" x2="120" y2="190" stroke="#7b2a20" stroke-width="4" opacity="0" />
+        <line id="leg-right" x1="140" y1="150" x2="160" y2="190" stroke="#7b2a20" stroke-width="4" opacity="0" />
+      </svg>
+      <div class="message" id="hint">Hint: —</div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
