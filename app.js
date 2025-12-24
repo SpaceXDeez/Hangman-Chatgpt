@@ -1,17 +1,3 @@
-// Word bank with hints for each round.
-const WORDS = [
-  { word: "codex", hint: "OpenAI coding assistant" },
-  { word: "ocean", hint: "A vast body of saltwater" },
-  { word: "breeze", hint: "Light wind" },
-  { word: "lantern", hint: "A light you can carry" },
-  { word: "museum", hint: "A home for history" },
-  { word: "jigsaw", hint: "Puzzle with interlocking pieces" },
-  { word: "galaxy", hint: "A spiral of stars" },
-  { word: "marble", hint: "Stone used for sculpture" },
-  { word: "pioneer", hint: "Trailblazer" },
-  { word: "vintage", hint: "Classic style" }
-];
-
 const MAX_MISSES = 6;
 // Cache for keyboard buttons so we can update their states quickly.
 const letterNodes = {};
